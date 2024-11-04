@@ -34,7 +34,7 @@
 1. Abra o arquivo index.html no navegador.
 2. Insira sua chave API da Exchange Rate API no código para obter as taxas de câmbio.
 
-**Contribuição**
+**Contribuição**:
 Sinta-se à vontade para fazer um fork do projeto e propor melhorias. Reporte bugs ou sugira novas funcionalidades através de Issues.
 
 **Licença**
