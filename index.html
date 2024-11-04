@@ -1,0 +1,577 @@
+<html><head><base href="." /><meta charset="UTF-8">
+<title>Conversor de Moedas Global - Sua Ferramenta Financeira</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+:root {
+  --primary: #2d2d2d;
+  --secondary: #4a4a4a;
+  --accent: #9B8B7C;
+  --text: #D9D9D9;
+  --zen-red: #BC002D;
+}
+
+body {
+  font-family: 'Yu Gothic', 'Noto Sans JP', sans-serif;
+  background: #f5f5f5;
+  background-image: 
+    linear-gradient(rgba(245, 245, 245, 0.95), rgba(245, 245, 245, 0.95)),
+    url("data:image/svg+xml,%3Csvg width='40' height='40' viewBox='0 0 40 40' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M20 20 L40 20 L40 40 Z' fill='%23e5e5e5'/%3E%3C/svg%3E");
+  color: var(--primary);
+}
+
+.container {
+  max-width: 800px;
+  margin: 2rem auto;
+  padding: 2rem;
+  background: rgba(255, 255, 255, 0.9);
+  border: 1px solid #e0e0e0;
+  box-shadow: 4px 4px 20px rgba(0, 0, 0, 0.05);
+  position: relative;
+}
+
+h1, h2, h3 {
+  font-weight: 300;
+  color: var(--primary);
+  border-bottom: 2px solid var(--zen-red);
+  padding-bottom: 0.5rem;
+}
+
+.converter-form {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.input-group {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 1rem;
+  align-items: center;
+}
+
+input, select {
+  padding: 0.8rem;
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border 0.3s ease;
+}
+
+input:focus, select:focus {
+  border-color: var(--accent);
+  outline: none;
+}
+
+button {
+  background: var(--accent);
+  border: 1px solid var(--accent);
+  color: white;
+  padding: 1rem;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 1.1rem;
+  transition: all 0.3s ease;
+}
+
+button:hover {
+  background: transparent;
+  color: var(--accent);
+  transform: none;
+}
+
+.result {
+  text-align: center;
+  font-size: 1.5rem;
+  margin-top: 2rem;
+  padding: 1rem;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+}
+
+.rates-table {
+  margin-top: 2rem;
+  width: 100%;
+  border-collapse: collapse;
+  border: 1px solid #e0e0e0;
+}
+
+.rates-table th, .rates-table td {
+  padding: 0.8rem;
+  text-align: left;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.rates-table th {
+  background: var(--accent);
+  color: white;
+}
+
+.loader {
+  display: none;
+  width: 50px;
+  height: 50px;
+  border: 3px solid #f3f3f3;
+  border-top: 3px solid var(--accent);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+  margin: 1rem auto;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.error {
+  color: #e74c3c;
+  text-align: center;
+  padding: 1rem;
+  background: rgba(231, 76, 60, 0.1);
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 2rem;
+  margin-top: 3rem;
+}
+
+.feature-card {
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  padding: 1.5rem;
+  border-radius: 12px;
+  text-align: center;
+  transition: all 0.3s ease;
+}
+
+.feature-card:hover {
+  transform: none;
+  border-color: var(--accent);
+}
+
+.feature-icon {
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+}
+
+.chart-container {
+  width: 100%;
+  height: 300px;
+  margin-top: 2rem;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  border-radius: 12px;
+  padding: 1rem;
+  position: relative;
+}
+
+canvas#chart {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+.historical-data {
+  margin-top: 2rem;
+  width: 100%;
+}
+
+.currency-info {
+  background: rgba(255, 255, 255, 0.05);
+  padding: 1rem;
+  border-radius: 8px;
+  margin-top: 1rem;
+}
+
+.currency-info h3 {
+  color: var(--accent);
+  margin-bottom: 0.5rem;
+}
+
+.popular-conversions {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 1rem;
+  margin-top: 2rem;
+}
+
+.conversion-card {
+  background: rgba(255, 255, 255, 0.1);
+  padding: 1rem;
+  border-radius: 8px;
+  text-align: center;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+
+.conversion-card:hover {
+  background: rgba(255, 255, 255, 0.2);
+}
+
+.news-ticker {
+  width: 100%;
+  overflow: hidden;
+  background: #fff;
+  border: 1px solid #e0e0e0;
+  padding: 0.5rem;
+  margin-top: 2rem;
+  border-radius: 8px;
+}
+
+.news-content {
+  animation: ticker 20s linear infinite;
+  white-space: nowrap;
+}
+
+@keyframes ticker {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(-100%); }
+}
+
+.footer {
+  margin-top: 3rem;
+  text-align: center;
+  padding: 2rem;
+  background: rgba(0, 0, 0, 0.1);
+}
+
+.container::before {
+  content: '';
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background: var(--zen-red);
+  opacity: 0.1;
+  clip-path: path('M20,0 L40,20 L20,40 L0,20 Z');
+}
+</style>
+</head>
+<body>
+  <div class="container">
+    <h1>🌎 Conversor de Moedas Global</h1>
+    
+    <div class="converter-form">
+      <div class="input-group">
+        <input type="number" id="amount" placeholder="Digite o valor" min="0" step="0.01" value="1">
+        <select id="from-currency">
+          <option value="USD">USD - Dólar Americano</option>
+          <option value="EUR">EUR - Euro</option>
+          <option value="BRL">BRL - Real Brasileiro</option>
+          <option value="GBP">GBP - Libra Esterlina</option>
+          <option value="JPY">JPY - Iene Japonês</option>
+          <option value="CNY">CNY - Yuan Chinês</option>
+          <option value="AUD">AUD - Dólar Australiano</option>
+          <option value="CAD">CAD - Dólar Canadense</option>
+        </select>
+      </div>
+      
+      <div class="input-group">
+        <select id="to-currency">
+          <option value="BRL">BRL - Real Brasileiro</option>
+          <option value="USD">USD - Dólar Americano</option>
+          <option value="EUR">EUR - Euro</option>
+          <option value="GBP">GBP - Libra Esterlina</option>
+          <option value="JPY">JPY - Iene Japonês</option>
+          <option value="CNY">CNY - Yuan Chinês</option>
+          <option value="AUD">AUD - Dólar Australiano</option>
+          <option value="CAD">CAD - Dólar Canadense</option>
+        </select>
+      </div>
+
+      <button onclick="convertCurrency()">Converter</button>
+      
+      <div class="loader" id="loader"></div>
+      <div class="result" id="result"></div>
+      <div id="error" class="error" style="display: none;"></div>
+    </div>
+
+    <div class="feature-grid">
+      <div class="feature-card">
+        <div class="feature-icon">💱</div>
+        <h3>Conversão em Tempo Real</h3>
+        <p>Taxas de câmbio atualizadas a cada minuto para maior precisão</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">📊</div>
+        <h3>Análise de Mercado</h3>
+        <p>Acompanhe tendências e variações das principais moedas</p>
+      </div>
+      <div class="feature-card">
+        <div class="feature-icon">🔒</div>
+        <h3>Dados Seguros</h3>
+        <p>Informações protegidas e atualizadas constantemente</p>
+      </div>
+    </div>
+
+    <div class="popular-conversions">
+      <h2>Conversões Populares</h2>
+      <div class="conversion-card" onclick="setConversion('USD', 'EUR')">
+        USD → EUR
+      </div>
+      <div class="conversion-card" onclick="setConversion('EUR', 'BRL')">
+        EUR → BRL
+      </div>
+      <div class="conversion-card" onclick="setConversion('GBP', 'USD')">
+        GBP → USD
+      </div>
+    </div>
+
+    <div class="currency-info">
+      <h3>Informações da Moeda</h3>
+      <div id="currency-details"></div>
+    </div>
+
+    <div class="news-ticker">
+      <div class="news-content">
+        Dólar opera em alta contra principais moedas • Euro mantém estabilidade no mercado internacional • Libra apresenta volatilidade após dados econômicos
+      </div>
+    </div>
+
+    <div class="chart-container">
+      <canvas id="chart"></canvas>
+    </div>
+
+    <div class="footer">
+      <p>© 2024 Conversor de Moedas Global</p>
+      <p>Dados fornecidos por Exchange Rate API</p>
+    </div>
+
+    <table class="rates-table" id="rates-table">
+      <thead>
+        <tr>
+          <th>Moeda</th>
+          <th>Taxa de Câmbio</th>
+        </tr>
+      </thead>
+      <tbody></tbody>
+    </table>
+  </div>
+
+<script>
+const API_KEY = '4e2a5c2f8a82b8d6887666f9'; // Chave API ativa
+const API_URL = 'https://v6.exchangerate-api.com/v6';
+
+async function convertCurrency() {
+    const amount = document.getElementById('amount').value;
+    const fromCurrency = document.getElementById('from-currency').value;
+    const toCurrency = document.getElementById('to-currency').value;
+    
+    const loader = document.getElementById('loader');
+    const result = document.getElementById('result');
+    const error = document.getElementById('error');
+    
+    if (!amount) {
+        showError('Por favor, digite um valor para converter.');
+        return;
+    }
+
+    try {
+        loader.style.display = 'block';
+        result.textContent = '';
+        error.style.display = 'none';
+
+        const response = await fetch(`${API_URL}/${API_KEY}/pair/${fromCurrency}/${toCurrency}/${amount}`);
+        if (!response.ok) {
+            throw new Error('Erro na resposta da API');
+        }
+        const data = await response.json();
+
+        if (data.result === 'success') {
+            const convertedAmount = data.conversion_result.toFixed(2);
+            const rate = data.conversion_rate.toFixed(4);
+            result.innerHTML = `
+                <div>${amount} ${fromCurrency} = ${convertedAmount} ${toCurrency}</div>
+                <div style="font-size: 0.8em; margin-top: 0.5rem;">Taxa: 1 ${fromCurrency} = ${rate} ${toCurrency}</div>
+            `;
+            updateRatesTable(fromCurrency);
+        } else {
+            showError('Erro ao converter moeda. Tente novamente.');
+        }
+    } catch (err) {
+        showError('Erro na conversão. Por favor, tente novamente em alguns instantes.');
+        console.error('Erro detalhado:', err);
+    } finally {
+        loader.style.display = 'none';
+    }
+}
+
+async function updateRatesTable(baseCurrency) {
+    try {
+        const response = await fetch(`${API_URL}/${API_KEY}/latest/${baseCurrency}`);
+        if (!response.ok) {
+            throw new Error('Erro na resposta da API');
+        }
+        const data = await response.json();
+
+        if (data.result === 'success') {
+            const tbody = document.querySelector('#rates-table tbody');
+            tbody.innerHTML = '';
+
+            Object.entries(data.conversion_rates)
+                .filter(([currency]) => ['USD', 'EUR', 'BRL', 'GBP', 'JPY', 'CNY', 'AUD', 'CAD'].includes(currency))
+                .sort((a, b) => a[0].localeCompare(b[0]))
+                .forEach(([currency, rate]) => {
+                    if (currency !== baseCurrency) {
+                        const row = tbody.insertRow();
+                        row.insertCell(0).textContent = `${currency} - ${getCurrencyName(currency)}`;
+                        row.insertCell(1).textContent = rate.toFixed(4);
+                    }
+                });
+        }
+    } catch (err) {
+        console.error('Erro ao atualizar tabela de taxas:', err);
+    }
+}
+
+function getCurrencyName(code) {
+    const currencies = {
+        'USD': 'Dólar Americano',
+        'EUR': 'Euro',
+        'BRL': 'Real Brasileiro',
+        'GBP': 'Libra Esterlina',
+        'JPY': 'Iene Japonês',
+        'CNY': 'Yuan Chinês',
+        'AUD': 'Dólar Australiano',
+        'CAD': 'Dólar Canadense'
+    };
+    return currencies[code] || code;
+}
+
+function showError(message) {
+    const error = document.getElementById('error');
+    error.textContent = message;
+    error.style.display = 'block';
+    document.getElementById('result').textContent = '';
+}
+
+function setConversion(from, to) {
+    document.getElementById('from-currency').value = from;
+    document.getElementById('to-currency').value = to;
+    convertCurrency();
+}
+
+function updateCurrencyInfo(currency) {
+    const currencyDetails = {
+        'USD': {
+            name: 'Dólar Americano',
+            description: 'Moeda oficial dos Estados Unidos e uma das principais moedas de reserva mundial.',
+            symbol: '$'
+        },
+        'EUR': {
+            name: 'Euro',
+            description: 'Moeda oficial da União Europeia, utilizada por 20 dos 27 países membros.',
+            symbol: '€'
+        },
+        'BRL': {
+            name: 'Real Brasileiro',
+            description: 'Moeda oficial do Brasil, introduzida em 1994 como parte do Plano Real.',
+            symbol: 'R$'
+        }
+    };
+
+    const info = currencyDetails[currency] || { name: currency, description: 'Informações não disponíveis', symbol: '' };
+    document.getElementById('currency-details').innerHTML = `
+        <h4>${info.name} (${currency})</h4>
+        <p>${info.description}</p>
+        <p>Símbolo: ${info.symbol}</p>
+    `;
+}
+
+// Criar gráfico com Chart.js
+function createChart(baseCurrency) {
+    const ctx = document.getElementById('chart').getContext('2d');
+    
+    // Historical USD/BRL data
+    const usdBrlData = {
+        labels: ['Mai 2024', 'Jun 2024', 'Jul 2024', 'Ago 2024', 'Set 2024', 'Out 2024'],
+        values: [5.07, 5.15, 5.25, 5.35, 5.45, 5.87]
+    };
+    
+    new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: usdBrlData.labels,
+            datasets: [{
+                label: `${baseCurrency}/BRL - Últimos 6 meses`,
+                data: baseCurrency === 'USD' ? usdBrlData.values : [1, 1.1, 1.05, 1.15, 1.1, 1.2],
+                borderColor: '#9B8B7C',
+                backgroundColor: 'rgba(155, 139, 124, 0.1)',
+                tension: 0.4,
+                pointRadius: 4,
+                pointBackgroundColor: '#9B8B7C',
+                borderWidth: 1.5,
+                fill: true
+            }]
+        },
+        options: {
+            responsive: true,
+            plugins: {
+                legend: {
+                    labels: {
+                        color: '#2d2d2d',
+                        font: {
+                            family: "'Yu Gothic', 'Noto Sans JP', sans-serif"
+                        }
+                    }
+                },
+                tooltip: {
+                    callbacks: {
+                        label: function(context) {
+                            return `R$ ${context.raw.toFixed(2)}`;
+                        }
+                    }
+                }
+            },
+            scales: {
+                y: {
+                    ticks: {
+                        callback: function(value) {
+                            return 'R$ ' + value.toFixed(2);
+                        },
+                        color: '#2d2d2d',
+                        font: {
+                            family: "'Yu Gothic', 'Noto Sans JP', sans-serif"
+                        }
+                    },
+                    grid: {
+                        color: 'rgba(0, 0, 0, 0.05)'
+                    },
+                    min: 5.00,
+                    max: 6.00
+                },
+                x: {
+                    ticks: {
+                        color: '#2d2d2d',
+                        font: {
+                            family: "'Yu Gothic', 'Noto Sans JP', sans-serif"
+                        }
+                    },
+                    grid: {
+                        display: false
+                    }
+                }
+            }
+        }
+    });
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    updateRatesTable('USD');
+    convertCurrency();
+    createChart('USD');
+    updateCurrencyInfo('USD');
+
+    // Atualizar informações quando a moeda de origem mudar
+    document.getElementById('from-currency').addEventListener('change', (e) => {
+        updateCurrencyInfo(e.target.value);
+        createChart(e.target.value);
+    });
+});
+</script>
+</body>
+</html>
