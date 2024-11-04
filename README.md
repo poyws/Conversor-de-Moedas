@@ -1,6 +1,6 @@
 # 🌎 Conversor de Moedas Global
 
-**Conversor de Moedas Global** é uma ferramenta de conversão de moedas em tempo real construída com JavaScript e HTML. Projetado para fornecer uma interface amigável e dados atualizados de diversas moedas globais, o conversor é ideal para usuários que precisam de uma visão rápida e precisa das taxas de câmbio.
+**Conversor de Moedas Global** é uma ferramenta de conversão de moedas em tempo real construída com JavaScript e HTML. Projetado para fornecer uma interface amigável e dados atualizados de diversas moedas globais, o conversor é ideal para usuários que precisam de uma visão rápida e precisa das taxas de câmbio. Adicione sua __API_KEY__ dentro do código para ele funcionar corretamente.
 
 ## Funcionalidades
 
